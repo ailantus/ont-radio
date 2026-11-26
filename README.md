@@ -51,7 +51,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Uygulama açılışta ve altı saatte bir
 `https://api.github.com/repos/ailantus/ont-radio/releases/latest` adresini kontrol eder.
-Etiket numarası (`v12` → `12`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
+Etiket numarası (`v15` → `15`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
 penceresi çıkar, release'deki APK indirilir ve Android yükleme ekranı açılır. Sürüm aynıysa
 veya daha yeniyse hiçbir şey yapılmaz. İndirme kesilirse kaldığı yerden devam eder.
 
@@ -62,7 +62,7 @@ Yeni sürüm yayınlama:
 3. `https://github.com/ailantus/ont-radio/releases/new` adresinde etiketi `v<versionCode>`
    olarak oluştur, APK dosyasını varlık olarak ekle ve yayınla.
 
-Şu anki sürüm: `v12` / `ONT RADIO 1.11` / `ont-radio-v12.apk`.
+Şu anki sürüm: `v15` / `ONT RADIO 1.14` / `ont-radio-v15.apk`.
 
 ## Web oynatıcı
 
