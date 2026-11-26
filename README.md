@@ -7,9 +7,10 @@ klasörü kullanılır (aşağıya bakın).
 
 ## Nasıl çalışır?
 
-1. `@radyoalse_bot` sohbetine mp3/audio/opus dosyası gönderilir.
-2. `.github/workflows/telegram-sync.yml` mesajı okur, `radio/playlist.json` dosyasına
-   gerçek Telegram `file_id` değerini ekler (beş dakikada bir).
+1. `@radyoalse_bot` sohbetine mp3/audio/opus dosyası gönderilir ya da eski bir şarkı forward edilir.
+2. Telegram webhook'u (`web-site/telegram-webhook.php`) mesajı anında işler ve gerçek Telegram
+   `file_id` değerini `radio/playlist.json` dosyasına yazar. `.github/workflows/telegram-sync.yml`
+   beş dakikada bir yedek senkron ve yinelenen şarkı temizliği yapar.
 3. Uygulama listeyi önbelleksiz CDN'den okur, `getFile` ile dosya yolunu çözer ve sesi
    Telegram'dan oynatır. Şarkılar Telegram'da kalır; GitHub'da yalnızca liste tutulur.
 4. Çalma karışık ve sürekli döngüdür; ekolayzır yoktur.
@@ -18,9 +19,11 @@ Canlı liste: `https://cdn.jsdelivr.net/gh/ailantus/ont-radio@main/radio/playlis
 
 ## Müzik gönderme
 
-Telegram'da `@radyoalse_bot` sohbetini aç ve bir ses dosyası gönder. Workflow yeni parçayı
- otomatik ekler. YouTube bağlantısı gönderilirse bot videoyu indirip Telegram'a yükler ve
-listeye ekler. Liste 100 parçayla sınırlıdır (en yeniler korunur).
+Telegram'da `@radyoalse_bot` sohbetini aç ve bir ses dosyası gönder ya da bir şarkıyı bota
+forward et. Parça saniyeler içinde listeye eklenir. Aynı `file_id` veya aynı başlık/sanatçı
+daha önce varsa yinelenen mesaj bot tarafından silinir ve liste tek tutulur. YouTube
+bağlantısı gönderilirse bot videoyu indirip Telegram'a yükler ve listeye ekler. Liste 100
+parçayla sınırlıdır (en yeniler korunur).
 
 Kanal veya grup kullanmak için botu kanala/gruba ekle ve gerekirse workflow'daki `chat_id`
 filtresini kaldır. Botun grup mesajlarını görebilmesi için BotFather `/setprivacy` ayarı
@@ -67,6 +70,9 @@ Adres: `https://ont-radio.rf.gd/`
 - `stream.php` Telegram `file_id` değerini PHP tarafında çözer; bot token tarayıcıya gönderilmez.
   InfinityFree sunucusu `api.telegram.org` DNS'ini çözemediği için `config.php` içindeki
   `TELEGRAM_API_IP` sabiti kullanılır.
+- `telegram-webhook.php` gönderilen/forward edilen şarkıyı anında `playlist.json` dosyasına
+  ekler; GitHub token yalnızca sunucudaki `config.php` içindedir. Webhook adresi ve gizli
+  anahtar `setWebhook` ile Telegram'a tanıtılmıştır.
 - Arayüz karışık çalar, süre sayacı ve ileri/geri/ses denetimi vardır.
 
 Yeniden yükleme (FTP bilgileri ortam değişkenlerinden okunur):
