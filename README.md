@@ -1,8 +1,9 @@
 # ONT RADIO
 
 Telegram'a gönderilen müzikleri GitHub çalma listesi üzerinden okuyan ve ses dosyalarını
-doğrudan Telegram'dan çalan Android uygulaması. Web sitesine veya kendi sunucuya bağlanmaz;
-`sunucu/` ve `web/` klasörleri yalnızca eski kurulumun arşividir.
+doğrudan Telegram'dan çalan Android uygulaması. Uygulama web sitesine bağlanmaz; `sunucu/`
+ve `web/` klasörleri eski kurulumun arşividir. Ayrı bir web oynatıcı için `web-site/`
+klasörü kullanılır (aşağıya bakın).
 
 ## Nasıl çalışır?
 
@@ -56,9 +57,30 @@ Yeni sürüm yayınlama:
 
 Şu anki sürüm: `v8` / `ONT RADIO 1.7` / `ont-radio-v8.apk`.
 
+## Web oynatıcı
+
+Adres: `https://ont-radio.rf.gd/`
+
+`web-site/` klasörü InfinityFree üzerinde çalışan küçük bir PHP oynatıcıdır:
+
+- `playlist.php` GitHub'daki `radio/playlist.json` dosyasını CDN'den okur (60 sn önbellek).
+- `stream.php` Telegram `file_id` değerini PHP tarafında çözer; bot token tarayıcıya gönderilmez.
+  InfinityFree sunucusu `api.telegram.org` DNS'ini çözemediği için `config.php` içindeki
+  `TELEGRAM_API_IP` sabiti kullanılır.
+- Arayüz karışık çalar, süre sayacı ve ileri/geri/ses denetimi vardır.
+
+Yeniden yükleme (FTP bilgileri ortam değişkenlerinden okunur):
+
+```bash
+cd TelegramRadyo/web-site
+FTP_USER=if0_xxxxx FTP_PASS=... python3 deploy.py
+```
+
 ## Notlar
 
 - En sorunsuz çalışma MP3 dosyalarıyladır; opus/ogg desteklenir ancak format geçişlerinde
   kısa kopmalar olabilir.
 - Çalma sırası her açılışta karıştırılır; bir tur bitince aynı parçalar yeniden karışır.
-- Eski sunucu ve PHP sitesi artık kullanılmaz; `radyo.rf.gd` kapalıdır.
+- Eski `radyo.rf.gd` sitesi kapalıdır; yeni web adresi `ont-radio.rf.gd`'dir.
+- Uygulamanın kapanma nedeni genellikle `ForegroundServiceDidNotStartInTimeException` olur;
+  `PlaybackService.onCreate()` içinde `startForeground` çağrısı bunu önler.
