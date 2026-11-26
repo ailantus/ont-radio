@@ -10,8 +10,8 @@ klasörü kullanılır (aşağıya bakın).
 1. `@radyoalse_bot` sohbetine mp3/audio/opus dosyası gönderilir ya da eski bir şarkı forward edilir.
 2. `.github/workflows/telegram-sync.yml` mesajı **her dakika** okur, gerçek Telegram `file_id`
    değerini `radio/playlist.json` dosyasına yazar ve yinelenen şarkıları temizler.
-3. Uygulama listeyi `raw.githubusercontent.com` üzerinden benzersiz `?ts=` ile okur, `getFile`
-   ile dosya yolunu çözer ve sesi
+3. Uygulama listeyi `raw.githubusercontent.com/.../heads/main/...` üzerinden benzersiz `?ts=`
+   ile okur, `getFile` ile dosya yolunu çözer ve sesi
    Telegram'dan oynatır. Şarkılar Telegram'da kalır; GitHub'da yalnızca liste tutulur.
 4. Çalma karışık ve sürekli döngüdür; ekolayzır yoktur.
 
@@ -48,7 +48,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Uygulama açılışta ve altı saatte bir
 `https://api.github.com/repos/ailantus/ont-radio/releases/latest` adresini kontrol eder.
-Etiket numarası (`v11` → `11`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
+Etiket numarası (`v12` → `12`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
 penceresi çıkar, release'deki APK indirilir ve Android yükleme ekranı açılır. Sürüm aynıysa
 veya daha yeniyse hiçbir şey yapılmaz. İndirme kesilirse kaldığı yerden devam eder.
 
@@ -59,7 +59,7 @@ Yeni sürüm yayınlama:
 3. `https://github.com/ailantus/ont-radio/releases/new` adresinde etiketi `v<versionCode>`
    olarak oluştur, APK dosyasını varlık olarak ekle ve yayınla.
 
-Şu anki sürüm: `v11` / `ONT RADIO 1.10` / `ont-radio-v11.apk`.
+Şu anki sürüm: `v12` / `ONT RADIO 1.11` / `ont-radio-v12.apk`.
 
 ## Web oynatıcı
 
@@ -90,8 +90,8 @@ FTP_USER=if0_xxxxx FTP_PASS=... python3 deploy.py
 - Çalma sırası her açılışta karıştırılır; bir tur bitince aynı parçalar yeniden karışır.
 - Uygulamaya geri dönüldüğünde (`onResume`) GitHub listesi hemen yenilenir; ayrıca 60 saniyede
   bir otomatik kontrol yapılır.
-- Bazı cihazlarda jsDelivr bayat liste döndürdüğü için uygulama `raw.githubusercontent.com`
-  üzerinden benzersiz `?ts=` ile okur.
+- Bazı ağlarda `/main/` ve jsDelivr bayat liste döndürdüğü için uygulama ve web oynatıcı
+  `raw.githubusercontent.com/.../heads/main/...` üzerinden benzersiz `?ts=` ile okur.
 - Eski `radyo.rf.gd` sitesi kapalıdır; yeni web adresi `ont-radio.rf.gd`'dir.
 - Uygulamanın kapanma nedeni genellikle `ForegroundServiceDidNotStartInTimeException` olur;
   `PlaybackService.onCreate()` içinde `startForeground` çağrısı bunu önler.
