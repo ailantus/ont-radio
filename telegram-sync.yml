@@ -1,0 +1,141 @@
+name: Telegram radyo senkronu
+
+on:
+  schedule:
+    - cron: '*/2 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: radyo-senkron
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Telegram mesajlarini oku
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, urllib.request, urllib.parse, uuid
+          from pathlib import Path
+
+          token = os.environ["BOT_TOKEN"]
+          root = Path("radio")
+          root.mkdir(exist_ok=True)
+          state_path = root / "state.json"
+          list_path = root / "playlist.json"
+          state = json.loads(state_path.read_text()) if state_path.exists() else {"offset": 0}
+          playlist = json.loads(list_path.read_text()) if list_path.exists() else {"tracks": []}
+
+          def api(method, params=None):
+              url = f"https://api.telegram.org/bot{token}/{method}"
+              if params:
+                  url += "?" + urllib.parse.urlencode(params)
+              with urllib.request.urlopen(url, timeout=30) as r:
+                  return json.load(r)
+
+          def add(audio, source):
+              if not audio:
+                  return
+              file_id = audio.get("file_id")
+              if not file_id:
+                  return
+              if any(t["file_id"] == file_id for t in playlist["tracks"]):
+                  return
+              title = audio.get("title") or audio.get("file_name") or "Parça"
+              artist = audio.get("performer") or source
+              playlist["tracks"].append({
+                  "file_id": file_id,
+                  "title": title,
+                  "artist": artist,
+                  "duration": int(audio.get("duration") or 0),
+              })
+
+          def youtube_to_telegram(text):
+              m = re.search(r"(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})", text)
+              if not m:
+                  return None
+              vid = m.group(1)
+              try:
+                  req = urllib.request.Request(
+                      "https://api.samplecut.app/v1/downloads",
+                      data=json.dumps({"url": f"https://www.youtube.com/watch?v={vid}"}).encode(),
+                      headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
+                  )
+                  with urllib.request.urlopen(req, timeout=90) as r:
+                      cut = json.load(r)
+                  download_url = cut.get("download_url") or cut.get("url") or cut.get("data", {}).get("download_url")
+                  if not download_url:
+                      return None
+                  with urllib.request.urlopen(download_url, timeout=120) as r:
+                      mp3 = r.read()
+                  title = vid
+                  try:
+                      with urllib.request.urlopen(
+                          f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={vid}&format=json",
+                          timeout=20,
+                      ) as r:
+                          title = json.load(r).get("title", vid)
+                  except Exception:
+                      pass
+                  boundary = "----" + uuid.uuid4().hex
+                  body = b""
+                  for name, value in (("chat_id", "490724383"), ("caption", title[:100])):
+                      body += f"--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n{value}\r\n".encode()
+                  body += (
+                      f"--{boundary}\r\nContent-Disposition: form-data; name=\"audio\"; filename=\"{vid}.mp3\"\r\n"
+                      "Content-Type: audio/mpeg\r\n\r\n"
+                  ).encode() + mp3 + f"\r\n--{boundary}--\r\n".encode()
+                  req = urllib.request.Request(
+                      f"https://api.telegram.org/bot{token}/sendAudio",
+                      data=body,
+                      headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+                  )
+                  with urllib.request.urlopen(req, timeout=90) as r:
+                      sent = json.load(r)
+                  return sent.get("result", {}).get("audio")
+              except Exception as e:
+                  print("YouTube hatası:", e)
+                  return None
+
+          updates = api("getUpdates", {"offset": state["offset"], "timeout": 0})["result"]
+          for upd in updates:
+              state["offset"] = upd["update_id"] + 1
+              msg = upd.get("message") or upd.get("channel_post") or {}
+              audio = msg.get("audio")
+              doc = msg.get("document")
+              if not audio and doc:
+                  name = doc.get("file_name", "")
+                  mime = doc.get("mime_type", "")
+                  if mime.startswith("audio/") or name.lower().endswith((".mp3", ".opus", ".ogg", ".m4a", ".wav")):
+                      audio = {"file_id": doc["file_id"], "title": name, "performer": "Telegram"}
+              if audio:
+                  add(audio, "Telegram")
+              text = msg.get("text", "")
+              if "youtube.com/watch" in text or "youtu.be/" in text:
+                  add(youtube_to_telegram(text), "YouTube")
+
+          playlist["tracks"] = playlist["tracks"][-100:]
+          state_path.write_text(json.dumps(state))
+          list_path.write_text(json.dumps(playlist, ensure_ascii=False, indent=2))
+          print("parça sayısı:", len(playlist["tracks"]))
+          PY
+
+      - name: Değişiklikleri kaydet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add radio
+          if git diff --cached --quiet; then
+            echo "Yeni şarkı yok"
+          else
+            git commit -m "Telegram çalma listesini güncelle"
+            git push
+          fi
