@@ -1,14 +1,64 @@
 # ONT RADIO
 
-Telegram'a gönderilen müzikleri canlı radyo olarak yayınlayan Android uygulaması.
+Telegram'a gönderilen müzikleri GitHub çalma listesi üzerinden okuyan ve ses dosyalarını
+doğrudan Telegram'dan çalan Android uygulaması. Web sitesine veya kendi sunucuya bağlanmaz;
+`sunucu/` ve `web/` klasörleri yalnızca eski kurulumun arşividir.
 
-## Güncelleme
+## Nasıl çalışır?
 
-APK dosyaları bu deponun Releases bölümünde yayınlanır.
-Uygulama açılışta son sürümü kontrol eder; etiket numarası telefondaki sürümden yeniyse ekranda "Güncelleme var" uyarısı çıkar ve APK indirilip yüklenir.
+1. `@radyoalse_bot` sohbetine mp3/audio/opus dosyası gönderilir.
+2. `.github/workflows/telegram-sync.yml` mesajı okur, `radio/playlist.json` dosyasına
+   gerçek Telegram `file_id` değerini ekler (beş dakikada bir).
+3. Uygulama listeyi önbelleksiz CDN'den okur, `getFile` ile dosya yolunu çözer ve sesi
+   Telegram'dan oynatır. Şarkılar Telegram'da kalır; GitHub'da yalnızca liste tutulur.
+4. Çalma karışık ve sürekli döngüdür; ekolayzır yoktur.
 
-Son sürüm: https://github.com/ailantus/ont-radio/releases/latest
+Canlı liste: `https://cdn.jsdelivr.net/gh/ailantus/ont-radio@main/radio/playlist.json`
 
-APK: https://github.com/ailantus/ont-radio/releases/download/v3/ont-radio-v3.apk
+## Müzik gönderme
 
-Not: radyo.rf.gd askıya alındığı için güncellemeler GitHub üzerinden yapılır.
+Telegram'da `@radyoalse_bot` sohbetini aç ve bir ses dosyası gönder. Workflow yeni parçayı
+ otomatik ekler. YouTube bağlantısı gönderilirse bot videoyu indirip Telegram'a yükler ve
+listeye ekler. Liste 100 parçayla sınırlıdır (en yeniler korunur).
+
+Kanal veya grup kullanmak için botu kanala/gruba ekle ve gerekirse workflow'daki `chat_id`
+filtresini kaldır. Botun grup mesajlarını görebilmesi için BotFather `/setprivacy` ayarı
+**Disable** olmalıdır.
+
+## Android uygulaması
+
+Kotlin + Jetpack Compose + Media3/ExoPlayer. Sunucu adresi girişi yoktur; açılışta GitHub
+listesine bağlanır. Ayarlar penceresinde `ONT RADIO · sürüm {versionName} ({versionCode})`
+gösterilir.
+
+Derleme ve kurulum:
+
+```bash
+cd TelegramRadyo
+./gradlew :app:assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+## Otomatik güncelleme
+
+Uygulama açılışta ve altı saatte bir
+`https://api.github.com/repos/ailantus/ont-radio/releases/latest` adresini kontrol eder.
+Etiket numarası (`v6` → `6`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
+penceresi çıkar, release'deki APK indirilir ve Android yükleme ekranı açılır. Sürüm aynıysa
+veya daha yeniyse hiçbir şey yapılmaz. İndirme kesilirse kaldığı yerden devam eder.
+
+Yeni sürüm yayınlama:
+
+1. `app/build.gradle.kts` içinde `versionCode` değerini artır, `versionName` güncelle.
+2. `./gradlew :app:assembleDebug` ile APK derle.
+3. `https://github.com/ailantus/ont-radio/releases/new` adresinde etiketi `v<versionCode>`
+   olarak oluştur, APK dosyasını varlık olarak ekle ve yayınla.
+
+Şu anki sürüm: `v6` / `ONT RADIO 1.5` / `ont-radio-v6.apk`.
+
+## Notlar
+
+- En sorunsuz çalışma MP3 dosyalarıyladır; opus/ogg desteklenir ancak format geçişlerinde
+  kısa kopmalar olabilir.
+- Çalma sırası her açılışta karıştırılır; bir tur bitince aynı parçalar yeniden karışır.
+- Eski sunucu ve PHP sitesi artık kullanılmaz; `radyo.rf.gd` kapalıdır.
