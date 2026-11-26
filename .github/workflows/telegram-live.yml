@@ -141,6 +141,24 @@ jobs:
                   print("YouTube hatasi:", e)
                   return None
 
+          def push_with_rebase():
+              # README/workflow commitleri checkout'tan sonra gelebilir; önce rebase et.
+              for attempt in range(4):
+                  pull = subprocess.run(
+                      ["git", "pull", "--rebase", "origin", "main"], capture_output=True, text=True
+                  )
+                  if pull.returncode == 0:
+                      push = subprocess.run(
+                          ["git", "push", "origin", "main"], capture_output=True, text=True
+                      )
+                      if push.returncode == 0:
+                          return
+                      print("push hatası:", push.stderr[-300:])
+                  else:
+                      print("rebase hatası:", pull.stderr[-300:])
+                  time.sleep(2)
+              raise RuntimeError("GitHub'a push yapılamadı")
+
           def save_and_push():
               playlist["tracks"] = playlist["tracks"][-100:]
               state_path.write_text(json.dumps(state))
@@ -149,7 +167,7 @@ jobs:
               if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
                   return False
               subprocess.run(["git", "commit", "-m", "Telegram çalma listesini güncelle (canlı)"], check=True)
-              subprocess.run(["git", "push"], check=True)
+              push_with_rebase()
               print("liste guncellendi:", len(playlist["tracks"]))
               return True
 
