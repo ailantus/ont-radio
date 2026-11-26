@@ -2,7 +2,7 @@ name: Telegram radyo senkronu
 
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Telegram mesajlarini oku
+        id: sync
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
@@ -66,21 +67,16 @@ jobs:
               title = audio.get("title") or audio.get("file_name") or "Parça"
               artist = audio.get("performer") or source
               key = song_key(title, artist)
-              duplicate = any(
-                  t.get("file_id") == file_id or
+              duplicates = [
+                  i for i, t in enumerate(playlist["tracks"])
+                  if t.get("file_id") == file_id or
                   song_key(t.get("title"), t.get("artist")) == key
-                  for t in playlist["tracks"]
-              )
-              if duplicate:
-                  if mid:
-                      try:
-                          api("deleteMessage", {"chat_id": CHAT_ID, "message_id": mid})
-                          print("yinelenen şarkı mesajı silindi:", mid, title)
-                      except Exception as e:
-                          print("şarkı silme hatası:", e)
-                  else:
-                      print("yinelenen şarkı atlandı:", title)
-                  return
+              ]
+              if duplicates:
+                  # Son gönderilen kalsın: eski kopyaları listeden çıkar.
+                  for i in reversed(duplicates):
+                      del playlist["tracks"][i]
+                  print("eski kopyalar çıkarıldı:", len(duplicates), title)
               playlist["tracks"].append({
                   "file_id": file_id,
                   "title": title,
@@ -142,17 +138,21 @@ jobs:
 
           # Mevcut listede aynı şarkı varsa tek tut; yeni gelenler de aynı kurala girer.
           cleaned, seen_ids, seen_keys = [], set(), set()
-          for track in playlist["tracks"]:
+          # Sondan başa doğru yürüyerek son gönderilen kopyayı koru.
+          for track in reversed(playlist["tracks"]):
               key = song_key(track.get("title"), track.get("artist"))
               if track.get("file_id") in seen_ids or key in seen_keys:
-                  print("listedeki yinelenen şarkı kaldırıldı:", track.get("title"))
+                  print("listedeki eski kopya kaldırıldı:", track.get("title"))
                   continue
               seen_ids.add(track.get("file_id"))
               seen_keys.add(key)
               cleaned.append(track)
-          playlist["tracks"] = cleaned
+          playlist["tracks"] = list(reversed(cleaned))
 
           updates = api("getUpdates", {"offset": state["offset"], "timeout": 0})["result"]
+          if updates:
+              with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+                  out.write("has_updates=true\n")
           for upd in updates:
               state["offset"] = upd["update_id"] + 1
               msg = upd.get("message") or upd.get("channel_post") or {}
@@ -187,3 +187,19 @@ jobs:
             git commit -m "Telegram çalma listesini güncelle"
             git push
           fi
+
+      - name: Kalan mesajlar için hemen yeniden kontrol et
+        if: steps.sync.outputs.has_updates == 'true'
+        env:
+          RADIO_PAT: ${{ secrets.RADIO_PAT }}
+        run: |
+          if [ -z "$RADIO_PAT" ]; then
+            echo "RADIO_PAT tanımlı değil; yeniden tetikleme atlandı"
+            exit 0
+          fi
+          curl -sS -X POST \
+            -H "Authorization: Bearer $RADIO_PAT" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"main"}' \
+            https://api.github.com/repos/ailantus/ont-radio/actions/workflows/telegram-sync.yml/dispatches
