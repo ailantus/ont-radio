@@ -8,19 +8,22 @@ klasörü kullanılır (aşağıya bakın).
 ## Nasıl çalışır?
 
 1. `@radyoalse_bot` sohbetine mp3/audio/opus dosyası gönderilir ya da eski bir şarkı forward edilir.
-2. `.github/workflows/telegram-sync.yml` mesajı **her dakika** okur, gerçek Telegram `file_id`
-   değerini `radio/playlist.json` dosyasına yazar ve yinelenen şarkıları temizler.
+2. `.github/workflows/telegram-live.yml` mesajı 30 saniyelik long-poll ile sürekli okur, gerçek
+   Telegram `file_id` değerini `radio/playlist.json` dosyasına yazar ve yinelenen şarkıları
+   temizler. Workflow 5,5 saat sonra kendisini yeniden tetikler; `RADIO_PAT` secret'i gereklidir.
+   (`telegram-sync.yml` elle çalıştırma için yedektir.)
 3. Uygulama listeyi `raw.githubusercontent.com/.../heads/main/...` üzerinden benzersiz `?ts=`
    ile okur, `getFile` ile dosya yolunu çözer ve sesi
    Telegram'dan oynatır. Şarkılar Telegram'da kalır; GitHub'da yalnızca liste tutulur.
 4. Çalma karışık ve sürekli döngüdür; ekolayzır yoktur.
 
-Canlı liste: `https://cdn.jsdelivr.net/gh/ailantus/ont-radio@main/radio/playlist.json`
+Canlı liste: `https://raw.githubusercontent.com/ailantus/ont-radio/heads/main/radio/playlist.json`
 
 ## Müzik gönderme
 
 Telegram'da `@radyoalse_bot` sohbetini aç ve bir ses dosyası gönder ya da bir şarkıyı bota
-forward et. Parça en fazla ~1 dakika içinde listeye eklenir. Aynı `file_id` veya aynı
+forward et. `telegram-live.yml` workflow'u Telegram'ı 30 saniyelik long-poll ile sürekli
+dinler; parça yaklaşık 30 saniye içinde listeye eklenir. Aynı `file_id` veya aynı
 başlık/sanatçı daha önce varsa eski kopyalar listeden çıkarılır; **son gönderilen** sürüm
 kalır. YouTube
 bağlantısı gönderilirse bot videoyu indirip Telegram'a yükler ve listeye ekler. Liste 100
