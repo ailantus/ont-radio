@@ -1,0 +1,222 @@
+name: Telegram radyo canli dinleme
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: radyo-live
+  cancel-in-progress: false
+
+jobs:
+  listen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Telegram'i 30 saniye long-poll ile dinle
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, subprocess, time, urllib.request, urllib.parse, uuid
+          from pathlib import Path
+
+          token = os.environ["BOT_TOKEN"]
+          root = Path("radio")
+          root.mkdir(exist_ok=True)
+          state_path = root / "state.json"
+          list_path = root / "playlist.json"
+          state = json.loads(state_path.read_text()) if state_path.exists() else {"offset": 0}
+          playlist = json.loads(list_path.read_text()) if list_path.exists() else {"tracks": []}
+          CHAT_ID = "490724383"
+          DEADLINE = time.monotonic() + 330 * 60  # 5.5 saat, sonra kendisini yeniden baslatir
+
+          subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+          subprocess.run(
+              ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+              check=True,
+          )
+
+          def api(method, params=None, timeout=40):
+              url = f"https://api.telegram.org/bot{token}/{method}"
+              if params:
+                  url += "?" + urllib.parse.urlencode(params)
+              with urllib.request.urlopen(url, timeout=timeout) as r:
+                  return json.load(r)
+
+          TRANS = str.maketrans({
+              "İ": "i", "I": "i", "ı": "i", "Ş": "s", "ş": "s",
+              "Ğ": "g", "ğ": "g", "Ü": "u", "ü": "u", "Ö": "o",
+              "ö": "o", "Ç": "c", "ç": "c",
+          })
+
+          def normalize(value):
+              text = (value or "").translate(TRANS).casefold().replace("\u0307", "")
+              return " ".join(re.sub(r"[^\w\s]", " ", text).split())
+
+          def song_key(title, artist):
+              return (normalize(title), normalize(artist))
+
+          def add(audio, source, message_id=None):
+              if not audio:
+                  return False
+              audio = dict(audio)
+              file_id = audio.get("file_id")
+              if not file_id:
+                  return False
+              title = audio.get("title") or audio.get("file_name") or "Parça"
+              artist = audio.get("performer") or source
+              key = song_key(title, artist)
+              duplicates = [
+                  i for i, t in enumerate(playlist["tracks"])
+                  if t.get("file_id") == file_id or
+                  song_key(t.get("title"), t.get("artist")) == key
+              ]
+              for i in reversed(duplicates):
+                  del playlist["tracks"][i]
+              if duplicates:
+                  print("eski kopyalar cikarildi:", len(duplicates), title)
+              playlist["tracks"].append({
+                  "file_id": file_id,
+                  "title": title,
+                  "artist": artist,
+                  "duration": int(audio.get("duration") or 0),
+              })
+              return True
+
+          def youtube_to_telegram(text):
+              m = re.search(r"(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})", text)
+              if not m:
+                  return None
+              vid = m.group(1)
+              try:
+                  req = urllib.request.Request(
+                      "https://api.samplecut.app/v1/downloads",
+                      data=json.dumps({"url": f"https://www.youtube.com/watch?v={vid}"}).encode(),
+                      headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"},
+                  )
+                  with urllib.request.urlopen(req, timeout=90) as r:
+                      cut = json.load(r)
+                  download_url = cut.get("download_url") or cut.get("url") or cut.get("data", {}).get("download_url")
+                  if not download_url:
+                      return None
+                  with urllib.request.urlopen(download_url, timeout=120) as r:
+                      mp3 = r.read()
+                  title = vid
+                  try:
+                      with urllib.request.urlopen(
+                          f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={vid}&format=json",
+                          timeout=20,
+                      ) as r:
+                          title = json.load(r).get("title", vid)
+                  except Exception:
+                      pass
+                  boundary = "----" + uuid.uuid4().hex
+                  body = b""
+                  for name, value in (("chat_id", CHAT_ID), ("caption", title[:100])):
+                      body += f"--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n{value}\r\n".encode()
+                  body += (
+                      f"--{boundary}\r\nContent-Disposition: form-data; name=\"audio\"; filename=\"{vid}.mp3\"\r\n"
+                      "Content-Type: audio/mpeg\r\n\r\n"
+                  ).encode() + mp3 + f"\r\n--{boundary}--\r\n".encode()
+                  req = urllib.request.Request(
+                      f"https://api.telegram.org/bot{token}/sendAudio",
+                      data=body,
+                      headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+                  )
+                  with urllib.request.urlopen(req, timeout=90) as r:
+                      sent = json.load(r)
+                  audio = sent.get("result", {}).get("audio")
+                  if audio:
+                      audio = dict(audio)
+                      audio["_message_id"] = sent["result"].get("message_id")
+                  return audio
+              except Exception as e:
+                  print("YouTube hatasi:", e)
+                  return None
+
+          def save_and_push():
+              playlist["tracks"] = playlist["tracks"][-100:]
+              state_path.write_text(json.dumps(state))
+              list_path.write_text(json.dumps(playlist, ensure_ascii=False, indent=2))
+              subprocess.run(["git", "add", "radio"], check=True)
+              if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+                  return False
+              subprocess.run(["git", "commit", "-m", "Telegram çalma listesini güncelle (canlı)"], check=True)
+              subprocess.run(["git", "push"], check=True)
+              print("liste guncellendi:", len(playlist["tracks"]))
+              return True
+
+          # Mevcut listede yinelenen varsa son gonderilen kopyayi koru.
+          cleaned, seen_ids, seen_keys = [], set(), set()
+          for track in reversed(playlist["tracks"]):
+              key = song_key(track.get("title"), track.get("artist"))
+              if track.get("file_id") in seen_ids or key in seen_keys:
+                  print("listedeki eski kopya kaldirildi:", track.get("title"))
+                  continue
+              seen_ids.add(track.get("file_id"))
+              seen_keys.add(key)
+              cleaned.append(track)
+          playlist["tracks"] = list(reversed(cleaned))
+          save_and_push()
+
+          while time.monotonic() < DEADLINE:
+              try:
+                  updates = api("getUpdates", {"offset": state["offset"], "timeout": 30})["result"]
+              except Exception as e:
+                  print("getUpdates hatasi:", e)
+                  time.sleep(5)
+                  continue
+
+              changed = False
+              for upd in updates:
+                  state["offset"] = upd["update_id"] + 1
+                  msg = upd.get("message") or upd.get("channel_post") or {}
+                  audio = msg.get("audio")
+                  doc = msg.get("document")
+                  if not audio and doc:
+                      name = doc.get("file_name", "")
+                      mime = doc.get("mime_type", "")
+                      if mime.startswith("audio/") or name.lower().endswith((".mp3", ".opus", ".ogg", ".m4a", ".wav")):
+                          audio = {"file_id": doc["file_id"], "title": name, "performer": "Telegram"}
+                  if audio:
+                      changed = add(audio, "Telegram", msg.get("message_id")) or changed
+                  text = msg.get("text", "")
+                  if "youtube.com/watch" in text or "youtu.be/" in text:
+                      yt_audio = youtube_to_telegram(text)
+                      changed = add(yt_audio, "YouTube") or changed
+
+              if changed or updates:
+                  save_and_push()
+
+          print("dinleme bitiyor, parça sayısı:", len(playlist["tracks"]))
+          PY
+
+      - name: Sonraki turu başlat
+        env:
+          RADIO_PAT: ${{ secrets.RADIO_PAT }}
+        run: |
+          if [ -z "$RADIO_PAT" ]; then
+            echo "RADIO_PAT tanımlı değil; zincir duracak"
+            exit 0
+          fi
+          API="https://api.github.com/repos/ailantus/ont-radio/actions/workflows/telegram-live.yml/runs?status=queued&per_page=100"
+          QUEUED=$(curl -sS -H "Authorization: Bearer $RADIO_PAT" -H "Accept: application/vnd.github+json" "$API" |
+            python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))')
+          if [ "$QUEUED" -gt 0 ]; then
+            echo "Sıradaki tur zaten var ($QUEUED); yeni tetikleme yok"
+            exit 0
+          fi
+          curl -sS -X POST \
+            -H "Authorization: Bearer $RADIO_PAT" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"main"}' \
+            https://api.github.com/repos/ailantus/ont-radio/actions/workflows/telegram-live.yml/dispatches
+          echo "Sonraki tur tetiklendi"
