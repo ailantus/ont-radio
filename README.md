@@ -46,7 +46,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Uygulama açılışta ve altı saatte bir
 `https://api.github.com/repos/ailantus/ont-radio/releases/latest` adresini kontrol eder.
-Etiket numarası (`v9` → `9`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
+Etiket numarası (`v10` → `10`) telefondaki `versionCode`'dan **yeni**se “Güncelleme var”
 penceresi çıkar, release'deki APK indirilir ve Android yükleme ekranı açılır. Sürüm aynıysa
 veya daha yeniyse hiçbir şey yapılmaz. İndirme kesilirse kaldığı yerden devam eder.
 
@@ -57,7 +57,7 @@ Yeni sürüm yayınlama:
 3. `https://github.com/ailantus/ont-radio/releases/new` adresinde etiketi `v<versionCode>`
    olarak oluştur, APK dosyasını varlık olarak ekle ve yayınla.
 
-Şu anki sürüm: `v9` / `ONT RADIO 1.8` / `ont-radio-v9.apk`.
+Şu anki sürüm: `v10` / `ONT RADIO 1.9` / `ont-radio-v10.apk`.
 
 ## Web oynatıcı
 
@@ -86,6 +86,8 @@ FTP_USER=if0_xxxxx FTP_PASS=... python3 deploy.py
 - En sorunsuz çalışma MP3 dosyalarıyladır; opus/ogg desteklenir ancak format geçişlerinde
   kısa kopmalar olabilir.
 - Çalma sırası her açılışta karıştırılır; bir tur bitince aynı parçalar yeniden karışır.
+- Uygulamaya geri dönüldüğünde (`onResume`) GitHub listesi hemen yenilenir; ayrıca 60 saniyede
+  bir otomatik kontrol yapılır.
 - Eski `radyo.rf.gd` sitesi kapalıdır; yeni web adresi `ont-radio.rf.gd`'dir.
 - Uygulamanın kapanma nedeni genellikle `ForegroundServiceDidNotStartInTimeException` olur;
   `PlaybackService.onCreate()` içinde `startForeground` çağrısı bunu önler.
