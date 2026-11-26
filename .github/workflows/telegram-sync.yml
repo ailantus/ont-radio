@@ -1,15 +1,13 @@
 name: Telegram radyo senkronu
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: radyo-senkron
+  group: radyo-live
   cancel-in-progress: false
 
 jobs:
