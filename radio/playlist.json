@@ -1,36 +1,6 @@
 {
   "tracks": [
     {
-      "file_id": "CQACAgQAAxkBAAIBS2sIZUQ5qv58Csmc7REZyxcJ1sj0AAIlIgACg3xAUGoFwZBWBDi0PQQ",
-      "title": "L'italiano - Toto Cutugno Video Ufficiale",
-      "artist": "Toto Cutugno",
-      "duration": 237
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBTGsIZUTv2arUnkUmrqf6QBiOyVk_AAIuIgACg3xAUPS9OqRUCu3WPQQ",
-      "title": "Gökhan Özen - Duman Gözlüm",
-      "artist": "Yakup Öktem",
-      "duration": 352
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBTWsIZUReqaE_x23AOi5Xol3H3pA2AAI3IgACg3xAUOB0eEQiN904PQQ",
-      "title": "Yalın - Son Aşkım #EllerineSağlık",
-      "artist": "YALIN",
-      "duration": 292
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBTmsIZUQhEf8LjmExPALvJtChawg9AAI-IgACg3xAUCP12Z-BAZU6PQQ",
-      "title": "Bir Daha",
-      "artist": "Zeynep Bastık",
-      "duration": 178
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBT2sIZUSGTpA8WSqORcAsTRzcvXloAAJHIgACg3xAUIq0taoWbp8rPQQ",
-      "title": "Kör Sevdam",
-      "artist": "Zeynep Bastık",
-      "duration": 192
-    },
-    {
       "file_id": "CQACAgQAAxkBAAIBUGsIZUQ4qdL3FyIIanD5q7DxjttiAAJPIgACg3xAUFS6iv2uzYrZPQQ",
       "title": "Lan",
       "artist": "Zeynep Bastık",
@@ -47,36 +17,6 @@
       "title": "Uslanmıyor Bu",
       "artist": "Zeynep Bastık",
       "duration": 194
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBVWsIZUUwJi7f73wRL6xA6axubV3eAAIwIgACg3xAUC08B_SlWBnXPQQ",
-      "title": "Ayy / Ben Hala Rüyada",
-      "artist": "Oğuzhan Koç",
-      "duration": 199
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBVmsIZUUAAVGxQXeqIZDsVELh3JO9UgACOSIAAoN8QFA0S3UzkRhVQz0E",
-      "title": "Beni İyi Sanıyorlar (Akustik)",
-      "artist": "Oğuzhan Koç",
-      "duration": 244
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBV2sIZUWWxEkB2vUzGx5g0YIS81O8AAI9IgACg3xAUKAlJMVsJIZ2PQQ",
-      "title": "Bulutlara Esir Olduk",
-      "artist": "Oğuzhan Koç",
-      "duration": 287
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBWGsIZUXc3hyzvEOSHtAc0741l3zTAAJGIgACg3xAUDkkdJhDOudiPQQ",
-      "title": "Küsme Aşka",
-      "artist": "Oğuzhan Koç",
-      "duration": 281
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBWWsIZUWbWhureAQjmB3MbNPBcNyKAAJOIgACg3xAUMmYNgRZsYPkPQQ",
-      "title": "Yok Sanayım",
-      "artist": "Oğuzhan Koç",
-      "duration": 210
     },
     {
       "file_id": "CQACAgQAAxkBAAIBWmsIZUU_T2Y455Rzvcn8zpL6Bjy5AAJSIgACg3xAUAjsF7PB93rFPQQ",
@@ -599,6 +539,66 @@
       "title": "Gitme Gülüm",
       "artist": "Niran Ünsal",
       "duration": 269
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBuGsJK1iaXK8Ybk5fu-tTyyJdP0m_AAKJIwACXe1JUNp9ItQsJnBbPQQ",
+      "title": "Haktan",
+      "artist": "Niran Ünsal",
+      "duration": 331
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBuWsJK1jJW8VtXfluym4E65wECQ5vAAKKIwACXe1JUKb_cZ6vzn7LPQQ",
+      "title": "En Büyük Aşkım",
+      "artist": "Nebi Demir",
+      "duration": 178
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBumsJK1jzkkKVrC7sjRCJgu9ltBC6AAKLIwACXe1JUG7crncplNAiPQQ",
+      "title": "Helal Et",
+      "artist": "Niran Ünsal",
+      "duration": 302
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBu2sJK1hoeN9WEEWyUr2gXxvE9hCkAAKMIwACXe1JUEDF9RoWxH-_PQQ",
+      "title": "Zorlu Sevdam",
+      "artist": "Niran Ünsal",
+      "duration": 292
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBvGsJK1ilrxPgd1LRNzyyf1TzXfwHAAKNIwACXe1JUFvOM0_P40HePQQ",
+      "title": "Ayy / Ben Hala Rüyada",
+      "artist": "Oğuzhan Koç",
+      "duration": 198
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBvWsJK1gLG9tAWqDL7iOPRRdGxce6AAKOIwACXe1JUG-XoRBuFNNYPQQ",
+      "title": "Beni İyi Sanıyorlar (Akustik)",
+      "artist": "Oğuzhan Koç",
+      "duration": 243
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBvmsJK1hbCiAizQQE4jQQ4NrB7sZoAAKPIwACXe1JUPbAfF61b0o5PQQ",
+      "title": "Bulutlara Esir Olduk",
+      "artist": "Oğuzhan Koç",
+      "duration": 286
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBv2sJK1i0aazrl5UgSqUGNBaQ2GuKAAKQIwACXe1JUEf1YTB0bq0JPQQ",
+      "title": "Küsme Aşka",
+      "artist": "Oğuzhan Koç",
+      "duration": 280
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBwGsJK1g1pGYdYzwKOw6JizQj9oZRAAKRIwACXe1JUNU02YDUCnYpPQQ",
+      "title": "Yok Sanayım",
+      "artist": "Oğuzhan Koç",
+      "duration": 209
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBwWsJK1jHv89_6AJF3vW8kjtOTn_FAAKSIwACXe1JUN_lPwT9iv3_PQQ",
+      "title": "Uyuyamadın Di Mi",
+      "artist": "Poizi",
+      "duration": 158
     }
   ]
 }
