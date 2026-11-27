@@ -1,24 +1,6 @@
 {
   "tracks": [
     {
-      "file_id": "BQACAgQAAxkDAANhawgoNH5t3jfiaDMAAfhjgxuU4DQtAAK9IQACg3xAUMPBSlb1eOw7PQQ",
-      "title": "Kayahan - Elmanın Yarısı ( Usul usul yavaşça şöyle, sokul bana sokul kal öyle ) - Günün Şarkısı",
-      "artist": "ClipWolf",
-      "duration": 0
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBG2sIUXsVK05ArsOl7psjNberi_QCAAL_IQACg3xAUAEniA2M0ecGPQQ",
-      "title": "Başımda Belalar",
-      "artist": "Poizi",
-      "duration": 170
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBI2sIZTnJtDy1bbH5UeRA24GyugABwgACGSIAAoN8QFDS4JicGRBQXT0E",
-      "title": "Canozan - Ağlama ben ağlarım",
-      "artist": "Can Ozan",
-      "duration": 209
-    },
-    {
       "file_id": "CQACAgQAAxkBAAIBJGsIZTmL-vzrt2HuJHL3oibK0q4nAAIaIgACg3xAUDSDCnerjkN_PQQ",
       "title": "Kayahan - Elmanın Yarısı ( Usul usul yavaşça şöyle, sokul bana sokul…",
       "artist": "ClipWolf",
@@ -469,18 +451,6 @@
       "duration": 182
     },
     {
-      "file_id": "CQACAgQAAxkBAAIBdWsJJl5fHVydU5Vnx2PZ4HKV665TAAJGIwACXe1JUMgoAy5qSYRLPQQ",
-      "title": "Ama Benim Ciğerim Yanar (Halil Yıldırım Remix)",
-      "artist": "Ebru Gündeş",
-      "duration": 198
-    },
-    {
-      "file_id": "CQACAgQAAxkBAAIBdmsJJl5hQrZ8uc7cJigYGQvrbLqEAAJHIwACXe1JUCBxShSUFfxuPQQ",
-      "title": "Araftayım",
-      "artist": "Ebru Gündeş",
-      "duration": 245
-    },
-    {
       "file_id": "CQACAgQAAxkBAAIBd2sJJl48Nd_BiHGvI2Q4IJWdtJ00AAJIIwACXe1JUNJPdBkOfj1MPQQ",
       "title": "Bir Çift Göz [Vivaturkiye.eu]",
       "artist": "Norm Ender , Ebru Gündeş",
@@ -569,6 +539,66 @@
       "title": "Yapar Mısın [Vivaturkiye.eu]",
       "artist": "Murat Boz , Poizi",
       "duration": 157
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBhmsJKoLpdNt4GRo1KEi_klk8TUSLAAJXIwACXe1JUN3Ifs5sSYq5PQQ",
+      "title": "Git",
+      "artist": "BLOK3",
+      "duration": 158
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBh2sJKoIMq5rXbzGO1CDf8Uh0lo5RAAJYIwACXe1JUHNYW9NYM-MFPQQ",
+      "title": "Napıyorsun Mesela",
+      "artist": "BLOK3",
+      "duration": 187
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBiGsJKoLJ2mSYh_catMsvGeBAWRzgAAJZIwACXe1JUONGak0F0g8CPQQ",
+      "title": "Sebebi Yar",
+      "artist": "BLOK3",
+      "duration": 198
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBiWsJKoIVqyEzeSwHpyOK4spfUI9GAAJaIwACXe1JUIkC2-Yj30tCPQQ",
+      "title": "Ağlama Ben Ağlarım",
+      "artist": "Can Ozan",
+      "duration": 208
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBimsJKoKAeDEl9a_rrGUIc8OOTroFAAJbIwACXe1JUMhGVn3Auk4kPQQ",
+      "title": "Bozuyorum Yeminimi",
+      "artist": "Demet Akalın",
+      "duration": 296
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBi2sJKoKEmwAB4DX-0YHZZJlkkX1FkgACXCMAAl3tSVCovF2HjoBnYj0E",
+      "title": "Yerinde Dur",
+      "artist": "Demet Akalın & Sefo",
+      "duration": 147
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBjGsJKoIiAlgjR8Ou5oqyZ_HLd8XPAAJdIwACXe1JUF1pZbeqDpiAPQQ",
+      "title": "Ama Benim Ciğerim Yanar (Halil Yıldırım Remix)",
+      "artist": "Ebru Gündeş",
+      "duration": 198
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBjWsJKoJt2NgEnFyuMCjvKct-w7-_AAJeIwACXe1JUAnPaeBGzyW6PQQ",
+      "title": "Araftayım",
+      "artist": "Ebru Gündeş",
+      "duration": 245
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBjmsJKoLDrVGjW8mc6-gafeA4zQhgAAJfIwACXe1JUKxyIIh99DdfPQQ",
+      "title": "Bir Çift Göz",
+      "artist": "Ebru Gündeş & Norm Ender",
+      "duration": 207
+    },
+    {
+      "file_id": "CQACAgQAAxkBAAIBj2sJKoIg8oW6oLHIC424FEeLZzCnAAJgIwACXe1JUEMh91MymCgcPQQ",
+      "title": "Nalan",
+      "artist": "Emir Can İğrek",
+      "duration": 209
     }
   ]
 }
